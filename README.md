@@ -1,2 +1,2 @@
-# bf2sap2
-brainfuck compiler to SAP-2 machinecode
+# bfc
+brainfuck compiler for the MOS Technology 6502 microprocessor
