@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-enum class BFTOKEN {
+enum class BfTokenType {
   INCREMENT_PTR,
   DECREMENT_PTR,
 
@@ -22,17 +22,17 @@ enum class BFTOKEN {
 class Token {
   
   public:
-    BFTOKEN tokentype;
+    BfTokenType tokentype;
     int count;
 
-    Token(BFTOKEN t, int c) {
+    Token(BfTokenType t, int c) {
       tokentype = t;
       count = c;
     }
 
     int is_compressible() const {
-      if ( tokentype == BFTOKEN::INCREMENT_PTR || tokentype == BFTOKEN::DECREMENT_PTR ||
-          tokentype == BFTOKEN::INCREMENT_DATA || tokentype == BFTOKEN::DECREMENT_DATA ) {
+      if ( tokentype == BfTokenType::INCREMENT_PTR || tokentype == BfTokenType::DECREMENT_PTR ||
+          tokentype == BfTokenType::INCREMENT_DATA || tokentype == BfTokenType::DECREMENT_DATA ) {
         return 1;
       } else {
         return 0;
@@ -57,28 +57,28 @@ void lexer(const std::string& input, std::vector<Token>& tokens) {
 
     switch(input[i]) {
       case '.':
-        tokens.emplace_back(BFTOKEN::OUTPUT, 1);
+        tokens.emplace_back(BfTokenType::OUTPUT, 1);
         break;
       case ',':
-        tokens.emplace_back(BFTOKEN::INPUT, 1);
+        tokens.emplace_back(BfTokenType::INPUT, 1);
         break;
       case '>':
-        tokens.emplace_back(BFTOKEN::INCREMENT_PTR, 1);
+        tokens.emplace_back(BfTokenType::INCREMENT_PTR, 1);
         break;
       case '<':
-        tokens.emplace_back(BFTOKEN::DECREMENT_PTR, 1);
+        tokens.emplace_back(BfTokenType::DECREMENT_PTR, 1);
         break;
       case '+':
-        tokens.emplace_back(BFTOKEN::INCREMENT_DATA, 1);
+        tokens.emplace_back(BfTokenType::INCREMENT_DATA, 1);
         break;
       case '-':
-        tokens.emplace_back(BFTOKEN::DECREMENT_DATA, 1);
+        tokens.emplace_back(BfTokenType::DECREMENT_DATA, 1);
         break;
       case '[':
-        tokens.emplace_back(BFTOKEN::START_LOOP, 1);
+        tokens.emplace_back(BfTokenType::START_LOOP, 1);
         break;
       case ']':
-        tokens.emplace_back(BFTOKEN::END_LOOP, 1);
+        tokens.emplace_back(BfTokenType::END_LOOP, 1);
         break;
       default:
         break;
