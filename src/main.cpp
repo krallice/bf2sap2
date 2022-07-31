@@ -5,40 +5,8 @@
 #include <fstream>
 #include <sstream>
 
-enum class BfTokenType {
-  INCREMENT_PTR,
-  DECREMENT_PTR,
-
-  INCREMENT_DATA,
-  DECREMENT_DATA,
-
-  OUTPUT,
-  INPUT,
-  
-  START_LOOP,
-  END_LOOP,
-};
-
-class Token {
-  
-  public:
-    BfTokenType tokentype;
-    int count;
-
-    Token(BfTokenType t, int c) {
-      tokentype = t;
-      count = c;
-    }
-
-    int is_compressible() const {
-      if ( tokentype == BfTokenType::INCREMENT_PTR || tokentype == BfTokenType::DECREMENT_PTR ||
-          tokentype == BfTokenType::INCREMENT_DATA || tokentype == BfTokenType::DECREMENT_DATA ) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-};
+#include "token.h"
+#include "6502.h"
 
 std::string ReadFileIntoString(const std::string& path) {
     auto ss = std::ostringstream{};
@@ -142,6 +110,8 @@ int main(int argc, char** argv) {
   for (auto c : compressedstring ) {
     std::cout << int(c.tokentype) << " " << int(c.count) << std::endl;
   }
+
+  compile_6502(compressedstring);
 
   return 0;
 }
