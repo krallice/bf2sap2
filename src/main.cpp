@@ -129,16 +129,16 @@ int main(int argc, char** argv) {
   }
 
   // First pass, convert our string to a vector of tokens:
-
   std::cout << "Pass 1: Converting string to vector of Tokens." << std::endl;
   std::vector<Token> lexerstring;
   lexer(program, lexerstring);
 
-  // Second pass, compress multiple incremental instructs into 
+  // Second pass, compress multiple incremental instructions into single tokens:
   std::cout << "Pass 2: Compressing Token string." << std::endl;
   std::vector<Token> compressedstring;
   compressor(lexerstring, compressedstring);
 
+  // Debug output:
   for (auto c : compressedstring ) {
     std::cout << int(c.tokentype) << " " << int(c.count) << std::endl;
   }
