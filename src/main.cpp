@@ -25,28 +25,28 @@ void lexer(const std::string& input, std::vector<Token>& tokens) {
 
     switch(input[i]) {
       case '.':
-        tokens.emplace_back(BfTokenType::OUTPUT, 1);
+        tokens.emplace_back(BfTokenType::OUTPUT, 1, i);
         break;
       case ',':
-        tokens.emplace_back(BfTokenType::INPUT, 1);
+        tokens.emplace_back(BfTokenType::INPUT, 1 ,i);
         break;
       case '>':
-        tokens.emplace_back(BfTokenType::INCREMENT_PTR, 1);
+        tokens.emplace_back(BfTokenType::INCREMENT_PTR, 1 ,i);
         break;
       case '<':
-        tokens.emplace_back(BfTokenType::DECREMENT_PTR, 1);
+        tokens.emplace_back(BfTokenType::DECREMENT_PTR, 1 ,i);
         break;
       case '+':
-        tokens.emplace_back(BfTokenType::INCREMENT_DATA, 1);
+        tokens.emplace_back(BfTokenType::INCREMENT_DATA, 1, i);
         break;
       case '-':
-        tokens.emplace_back(BfTokenType::DECREMENT_DATA, 1);
+        tokens.emplace_back(BfTokenType::DECREMENT_DATA, 1, i);;
         break;
       case '[':
-        tokens.emplace_back(BfTokenType::START_LOOP, 1);
+        tokens.emplace_back(BfTokenType::START_LOOP, 1, i);
         break;
       case ']':
-        tokens.emplace_back(BfTokenType::END_LOOP, 1);
+        tokens.emplace_back(BfTokenType::END_LOOP, 1, i);
         break;
       default:
         break;
@@ -55,7 +55,7 @@ void lexer(const std::string& input, std::vector<Token>& tokens) {
   return;
 }
 
-void compressor(const std::vector<Token>& lexerstring, std::vector<Token>& compressedstring) {
+void compress_tokenstring(const std::vector<Token>& lexerstring, std::vector<Token>& compressedstring) {
 
   // Iterate over the raw tokenstring
   std::vector<Token>::size_type i = 0;
@@ -63,7 +63,7 @@ void compressor(const std::vector<Token>& lexerstring, std::vector<Token>& compr
 
     if (lexerstring[i].is_compressible()) {
 
-      Token newtoken(lexerstring[i].tokentype, 1);
+      Token newtoken(lexerstring[i].tokentype, 1, i);
 
       std::vector<Token>::size_type j = i + 1;
       while (j < lexerstring.size()) {
@@ -96,19 +96,27 @@ int main(int argc, char** argv) {
     program = ">++++++++[<+++++++++>-]<.>++++[<+++++++>-]<+.+++++++..+++.>>++++++[<+++++++>-]<++.------------.>++++++[<+++++++++>-]<+.<.+++.------.--------.>>>++++[<++++++++>-]<+.";
   }
 
+  // Lexer:
+
   // First pass, convert our string to a vector of tokens:
-  std::cout << "Pass 1: Converting string to vector of Tokens." << std::endl;
+  std::cout << "Phase 1a Lexer: Convert source bf string to vector of Tokens." << std::endl;
   std::vector<Token> lexerstring;
   lexer(program, lexerstring);
 
   // Second pass, compress multiple incremental instructions into single tokens:
-  std::cout << "Pass 2: Compressing Token string." << std::endl;
+  std::cout << "Phase 1b Lexer: Compress Token string." << std::endl;
   std::vector<Token> compressedstring;
-  compressor(lexerstring, compressedstring);
+  compress_tokenstring(lexerstring, compressedstring);
+
+  // At this stage, compressedstring contains our tokenized version of the raw .bf program.
+  // There is no promise that the program is gramatically valid, only that it contains all valid Tokens.
+
+  // Parser:
 
   // Debug output:
+  std::cout << "TOKENTYPE COUNT POSITION" << std::endl;
   for (auto c : compressedstring ) {
-    std::cout << int(c.tokentype) << " " << int(c.count) << std::endl;
+    std::cout << int(c.tokentype) << " " << int(c.count) << " " << int(c.position) << std::endl;
   }
 
   compile_6502(compressedstring);

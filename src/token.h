@@ -20,10 +20,12 @@ class Token {
   public:
     BfTokenType tokentype;
     int count;
+    size_t position;
 
-    Token(BfTokenType t, int c) {
+    Token(BfTokenType t, int c, size_t p) {
       tokentype = t;
       count = c;
+      position = p;
     }
 
     int is_compressible() const {
