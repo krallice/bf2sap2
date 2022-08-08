@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <array>
+#include <stack>
 
 #include <fstream>
 #include <sstream>
@@ -87,6 +88,41 @@ void compress_tokenstring(const std::vector<Token>& lexerstring, std::vector<Tok
   }
 }
 
+// Returns -1 on success:
+int validate_tokenstring(std::vector<Token>& tokenstring, int& parser_error_char_number, std::string& parser_error_message) {
+
+  // Stack to match our loop commands:
+  std::stack<std::vector<Token>::size_type> loopstack;
+
+  // Iterate over the raw tokenstring:
+  std::vector<Token>::size_type i = 0;
+  while (i < tokenstring.size()) {
+
+    if (tokenstring[i].tokentype == BfTokenType::START_LOOP) {
+        loopstack.push(i);
+    } else if (tokenstring[i].tokentype == BfTokenType::END_LOOP) {
+        if (loopstack.size() > 0) {
+          // Link each loop command to each other:
+          tokenstring[i].matching_loop_index = loopstack.top();
+          tokenstring[loopstack.top()].matching_loop_index = i;
+          loopstack.pop();
+        } else {
+          parser_error_char_number = tokenstring[i].position;
+          parser_error_message = "Loop End without a matching Loop Start";
+          return 1;
+        }
+    }
+    i++;
+  }
+
+  if (loopstack.size() > 0) {
+    parser_error_char_number = tokenstring[i].position;
+    parser_error_message = "Loop Start without a matching Loop End";
+    return 1;
+  }
+  return 0;
+}
+
 int main(int argc, char** argv) {
 
   std::string program;
@@ -112,12 +148,22 @@ int main(int argc, char** argv) {
   // There is no promise that the program is gramatically valid, only that it contains all valid Tokens.
 
   // Parser:
+  std::cout << "Phase 2a Parser: Syntax checking Loop commands." << std::endl;
+  int parser_error_char_number = 0;
+  std::string parser_error_message;
+  int r = validate_tokenstring(compressedstring, parser_error_char_number, parser_error_message);
+  if ( r != 0) {
+    std::cout << "Phase 2a Parser: ERROR found in source code at <<Character " << parser_error_char_number << ">>" << std::endl;
+    std::cout << "Phase 2a Parser: <<" << parser_error_message << ">>" << std::endl;
+    return 1;
+  }
+  std::cout << "Phase 2a Parser: All looks OK." << std::endl;
 
   // Debug output:
-  std::cout << "TOKENTYPE COUNT POSITION" << std::endl;
-  for (auto c : compressedstring ) {
-    std::cout << int(c.tokentype) << " " << int(c.count) << " " << int(c.position) << std::endl;
-  }
+  // std::cout << "TOKENTYPE COUNT POSITION" << std::endl;
+  // for (auto c : compressedstring ) {
+  //   std::cout << int(c.tokentype) << " " << int(c.count) << " " << int(c.position) << std::endl;
+  // }
 
   compile_6502(compressedstring);
 

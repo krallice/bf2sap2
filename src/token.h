@@ -20,12 +20,14 @@ class Token {
   public:
     BfTokenType tokentype;
     int count;
-    size_t position;
+    size_t position; // Original position in source code
+    size_t matching_loop_index; // Index of the matching loop command, set to -1 for non loop tokens
 
     Token(BfTokenType t, int c, size_t p) {
-      tokentype = t;
-      count = c;
-      position = p;
+      this->tokentype = t;
+      this->count = c;
+      this->position = p;
+      this->matching_loop_index = -1;
     }
 
     int is_compressible() const {
